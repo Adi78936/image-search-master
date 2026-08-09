@@ -9,11 +9,17 @@ export const API_BASE = rawBase ? rawBase.replace(/\/$/, '') : '';
 
 const resolveUrl = (path) => (API_BASE ? `${API_BASE}${path}` : path);
 
-export const withCreds = (path, options = {}) =>
-  fetch(resolveUrl(path), {
+export const withCreds = (path, options = {}) => {
+  const { timeout = 5000, ...fetchOptions } = options;
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeout);
+
+  return fetch(resolveUrl(path), {
     credentials: 'include',
-    headers: { 'Content-Type': 'application/json', ...(options.headers || {}) },
-    ...options,
-  });
+    headers: { 'Content-Type': 'application/json', ...(fetchOptions.headers || {}) },
+    signal: controller.signal,
+    ...fetchOptions,
+  }).finally(() => clearTimeout(timer));
+};
 
 export const authUrl = (provider) => resolveUrl(`/auth/${provider}`);
