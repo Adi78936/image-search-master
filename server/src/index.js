@@ -10,6 +10,8 @@ import authRoutes from './routes/auth.js';
 import apiRoutes from './routes/api.js';
 
 const app = express();
+app.set('trust proxy', 1);
+
 const DISABLE_AUTH = process.env.DISABLE_AUTH === 'true';
 
 app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
@@ -52,7 +54,7 @@ if (DISABLE_AUTH) {
       cookie: {
         httpOnly: true,
         sameSite: 'lax',
-        secure: false,
+        secure: process.env.NODE_ENV === 'production',
         maxAge: 1000 * 60 * 60 * 24 * 7,
       },
     }),

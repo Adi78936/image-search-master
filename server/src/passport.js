@@ -28,13 +28,17 @@ const commonVerify = (profile, done) => {
   }
 };
 
+const callbackURL =
+  process.env.CALLBACK_URL ||
+  'https://image-search-master.onrender.com/auth/github/callback';
+
 if (HAS_GITHUB) {
   passport.use(
     new GitHubStrategy(
       {
         clientID: process.env.GITHUB_CLIENT_ID,
         clientSecret: process.env.GITHUB_CLIENT_SECRET,
-        callbackURL: '/auth/github/callback',
+        callbackURL,
       },
       (_accessToken, _refreshToken, profile, done) => commonVerify(profile, done),
     ),
