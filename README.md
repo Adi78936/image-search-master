@@ -6,7 +6,6 @@ Unsplash-powered search with GitHub OAuth on a MERN stack.
 
 ## Prerequisites
 - Node.js 20+ and npm 10+
-- MongoDB running locally on `mongodb://localhost:27017`
 - A GitHub OAuth app and an Unsplash access key
 
 ## 1. Clone & Install
@@ -36,7 +35,6 @@ Open `server/.env` and set values for:
 | Variable | Purpose |
 | -------- | ------- |
 | `PORT` | Express port (default `5000`) |
-| `MONGO_URI` | MongoDB connection string |
 | `SESSION_SECRET` | Random string for session cookies |
 | `CLIENT_URL` | URL where the React app runs (default `http://localhost:5173`) |
 | `UNSPLASH_ACCESS_KEY` | Unsplash API access key |
@@ -68,7 +66,6 @@ mern-oauth-image-search-nodocker/
   server/            # Express + Passport back-end
     src/
       middleware/    # Auth guards (e.g. ensureAuth)
-      models/        # Mongoose models (User, Search)
       routes/        # API + OAuth routes
       index.js       # Express app bootstrapping
       passport.js    # Passport strategy setup
@@ -97,7 +94,6 @@ Open `http://localhost:5173`. You will land on the login screen until you authen
 - `POST /auth/logout` -> clears the session
 
 ## Troubleshooting
-- Confirm MongoDB is running and reachable at the URI in `server/.env`.
 - If OAuth login keeps redirecting to `/login`, re-check your client/secret values and callback URLs.
 - To explore the UI without real credentials, temporarily set `DISABLE_AUTH=true` and restart the server; the app will auto-sign in as a guest.
 - Restart both client and server after changing any `.env` file so new values are loaded.

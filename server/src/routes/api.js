@@ -1,22 +1,11 @@
 import { Router } from 'express';
 import ensureAuth from '../middleware/ensureAuth.js';
-import Search from '../models/Search.js';
 import fetch from 'node-fetch';
 
 const router = Router();
 
-router.get('/top-searches', async (_req, res) => {
-  try {
-    const top = await Search.aggregate([
-      { $project: { termLower: { $toLower: '$term' } } },
-      { $group: { _id: '$termLower', count: { $sum: 1 } } },
-      { $sort: { count: -1 } },
-      { $limit: 5 },
-    ]);
-    res.json(top.map((t) => ({ term: t._id, count: t.count })));
-  } catch (e) {
-    res.status(500).json({ error: 'Failed to load top searches' });
-  }
+router.get('/top-searches', (_req, res) => {
+  res.json([]);
 });
 
 router.post('/search', ensureAuth, async (req, res) => {
@@ -25,8 +14,6 @@ router.post('/search', ensureAuth, async (req, res) => {
     if (!term || typeof term !== 'string') {
       return res.status(400).json({ error: 'term is required' });
     }
-
-    await Search.create({ user: req.user._id, term });
 
     const url = new URL('https://api.unsplash.com/search/photos');
     url.searchParams.set('query', term);
@@ -53,16 +40,8 @@ router.post('/search', ensureAuth, async (req, res) => {
   }
 });
 
-router.get('/history', ensureAuth, async (req, res) => {
-  try {
-    const items = await Search.find({ user: req.user._id })
-      .sort({ timestamp: -1 })
-      .limit(100)
-      .lean();
-    res.json(items.map((i) => ({ term: i.term, timestamp: i.timestamp })));
-  } catch (e) {
-    res.status(500).json({ error: 'Failed to load history' });
-  }
+router.get('/history', ensureAuth, (_req, res) => {
+  res.json([]);
 });
 
 export default router;

@@ -1,36 +1,27 @@
 import passport from 'passport';
 import { Strategy as GitHubStrategy } from 'passport-github2';
-import User from './models/User.js';
 
 const HAS_GITHUB = Boolean(
   process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET,
 );
 
 passport.serializeUser((user, done) => {
-  done(null, user.id);
+  done(null, user);
 });
 
-passport.deserializeUser(async (id, done) => {
-  try {
-    const user = await User.findById(id);
-    done(null, user);
-  } catch (e) {
-    done(e);
-  }
+passport.deserializeUser((user, done) => {
+  done(null, user);
 });
 
-const commonVerify = async (profile, done) => {
+const commonVerify = (profile, done) => {
   try {
-    const provider = profile.provider;
-    const providerId = profile.id;
-    const displayName = profile.displayName || profile.username || 'User';
-    const photo = profile.photos?.[0]?.value || '';
-
-    let user = await User.findOne({ provider, providerId });
-    if (!user) {
-      user = await User.create({ provider, providerId, displayName, photo });
-    }
-
+    const user = {
+      _id: `${profile.provider}_${profile.id}`,
+      provider: profile.provider,
+      providerId: profile.id,
+      displayName: profile.displayName || profile.username || 'User',
+      photo: profile.photos?.[0]?.value || '',
+    };
     return done(null, user);
   } catch (e) {
     return done(e);
