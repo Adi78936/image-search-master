@@ -18,13 +18,21 @@ export default function AuthProvider({ children }) {
     let cancelled = false;
 
     withCreds('/auth/user')
-      .then((res) => (res.ok ? res.json() : null))
+      .then(async (res) => {
+        if (!res.ok) return null;
+        const contentType = res.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+          return res.json();
+        }
+        return null;
+      })
       .then((data) => {
         if (!cancelled) {
           setUser(data && data._id ? data : null);
         }
       })
-      .catch(() => {
+      .catch((err) => {
+        console.error('Auth check error:', err);
         if (!cancelled) {
           setUser(null);
         }
