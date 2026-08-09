@@ -1,50 +1,58 @@
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
+import { ApertureIcon, LogOutIcon, MoonIcon, SunIcon } from './Icon';
 
 export default function Navbar() {
   const { user, logout } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const name = user?.displayName || '';
-  const showUser = Boolean(user);
 
   return (
     <header className="header panel">
       <div className="brandGroup">
-        <div className="brand">
-          <span className="brandMark" aria-hidden="true">
-            *
+        <h1 className="brand">
+          <span className="brandMark">
+            <ApertureIcon size={20} />
           </span>
-          MERN Image Search
-        </div>
-        <p className="tagline">
-          Find and curate Unsplash photography in seconds.
-        </p>
+          Image Search
+        </h1>
+        <p className="tagline">Find and curate Unsplash photography in seconds.</p>
       </div>
 
-      {showUser && (
-        <div className="userBadge">
-          {user.photo && (
-            <img
-              src={user.photo}
-              alt={name}
-              width={34}
-              height={34}
-              className="userAvatar"
-              loading="lazy"
-            />
-          )}
-          <div className="userDetails">
-            <span className="userLabel">Signed in as</span>
-            <span className="userName">{name}</span>
+      <div className="headerActions">
+        <button
+          type="button"
+          className="btn btn--subtle btn--icon"
+          onClick={toggleTheme}
+          aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}
+          title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}
+        >
+          {theme === 'dark' ? <SunIcon size={20} /> : <MoonIcon size={20} />}
+        </button>
+
+        {user && (
+          <div className="userBadge">
+            {user.photo && (
+              <img
+                src={user.photo}
+                alt=""
+                width={32}
+                height={32}
+                className="userAvatar"
+                loading="lazy"
+              />
+            )}
+            <span className="userDetails">
+              <span className="userLabel">Signed in</span>
+              <span className="userName">{name}</span>
+            </span>
+            <button type="button" className="btn btn--subtle" onClick={logout}>
+              <LogOutIcon size={18} />
+              Sign out
+            </button>
           </div>
-          <button
-            type="button"
-            className="btn subtle"
-            onClick={logout}
-            aria-label="Sign out"
-          >
-            Sign out
-          </button>
-        </div>
-      )}
+        )}
+      </div>
     </header>
   );
 }
