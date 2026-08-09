@@ -55,11 +55,12 @@ http://localhost:5000/auth/github/callback
 mern-oauth-image-search-nodocker/
   client/            # React + Vite front-end
     src/
-      components/    # UI pieces (Navbar, SearchBar, Login, etc.)
-      context/       # Auth context provider and hooks
+      components/    # UI pieces (Navbar, SearchBar, ImageGrid, Lightbox, Icon, etc.)
+      context/       # Auth, Theme and Toast providers
+      hooks/         # useImageSearch (search request), useSearchHistory (local history)
       api.js         # Fetch helpers + base URL
       App.jsx        # Main app shell
-      styles.css     # Global styling and theme tokens
+      styles.css     # Design tokens, light/dark themes, component styles
     index.html       # Vite entry template
     vite.config.js   # Vite dev/build configuration
 
@@ -86,12 +87,23 @@ npm run dev
 
 Open `http://localhost:5173`. You will land on the login screen until you authenticate with one of the enabled providers. The navigation bar provides a **Sign out** button to end your session.
 
+## Front-end Features
+- **Search** with recent-term suggestions (arrow keys to pick), `/` to focus the field, and a clear button.
+- **Lightbox preview** - full-size photo, arrow-key navigation, focus trap, `Esc` to close.
+- **Selection** - toggle any card, select all, copy one or all Unsplash links to the clipboard.
+- **History & top searches** - stored locally, click any entry to re-run that search.
+- **Light and dark themes** - follows the system preference, toggleable, remembered across visits.
+- **Accessibility** - visible focus rings, 44px touch targets, `prefers-reduced-motion` support, live-region announcements, WCAG AA contrast in both themes.
+
 ## API Snapshot
-- `GET /api/top-searches` -> top 5 search terms (global)
 - `POST /api/search` -> body `{ term }`, returns Unsplash image results (auth required)
-- `GET /api/history` -> recent searches for the signed-in user (auth required)
 - `GET /auth/user` -> current user profile or `null`
 - `POST /auth/logout` -> clears the session
+
+> `GET /api/top-searches` and `GET /api/history` still exist but return a hardcoded
+> empty array since the datastore was removed, so the client keeps its own history in
+> `localStorage` (see `client/src/hooks/useSearchHistory.js`). Point that hook back at
+> the API if the store returns.
 
 ## Troubleshooting
 - If OAuth login keeps redirecting to `/login`, re-check your client/secret values and callback URLs.
